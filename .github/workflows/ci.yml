@@ -1,0 +1,265 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: [frontend, backend]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run ESLint (${{ matrix.package }})
+        run: pnpm --filter ${{ matrix.package }} lint
+
+  type-check:
+    name: Type Check
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: [frontend, backend]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run TypeScript type check (${{ matrix.package }})
+        run: pnpm --filter ${{ matrix.package }} type-check
+
+  test-frontend:
+    name: Test (Frontend)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run tests with coverage
+        run: pnpm --filter frontend test:coverage
+
+      - name: Check coverage threshold
+        run: |
+          if [ -f frontend/coverage/coverage-summary.json ]; then
+            COVERAGE=$(cat frontend/coverage/coverage-summary.json | jq '.total.lines.pct')
+            echo "Frontend Coverage: $COVERAGE%"
+            if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+              echo "❌ Frontend coverage $COVERAGE% is below 80% threshold"
+              exit 1
+            fi
+            echo "✅ Frontend coverage $COVERAGE% meets 80% threshold"
+          else
+            echo "⚠️  No frontend coverage report found, skipping threshold check"
+          fi
+
+      - name: Upload frontend coverage
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          file: ./frontend/coverage/coverage-final.json
+          flags: frontend
+          name: frontend-coverage
+          fail_ci_if_error: false
+
+  test-backend:
+    name: Test (Backend)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run database migrations
+        run: pnpm --filter backend db:migrate
+
+      - name: Run tests with coverage
+        run: pnpm --filter backend test:coverage
+
+      - name: Check coverage threshold
+        run: |
+          if [ -f backend/coverage/coverage-summary.json ]; then
+            COVERAGE=$(cat backend/coverage/coverage-summary.json | jq '.total.lines.pct')
+            echo "Backend Coverage: $COVERAGE%"
+            if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+              echo "❌ Backend coverage $COVERAGE% is below 80% threshold"
+              exit 1
+            fi
+            echo "✅ Backend coverage $COVERAGE% meets 80% threshold"
+          else
+            echo "⚠️  No backend coverage report found, skipping threshold check"
+          fi
+
+      - name: Upload backend coverage
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          file: ./backend/coverage/coverage-final.json
+          flags: backend
+          name: backend-coverage
+          fail_ci_if_error: false
+
+  build-frontend:
+    name: Build (Frontend)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build frontend
+        run: pnpm run build:frontend
+        env:
+          VITE_API_URL: https://api.example.com
+
+      - name: Check build output
+        run: |
+          if [ -d "frontend/dist" ]; then
+            echo "✅ Frontend build successful - dist directory created"
+            ls -la frontend/dist
+          else
+            echo "❌ Frontend build failed - dist directory not found"
+            exit 1
+          fi
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
+          retention-days: 7
+
+  build-backend:
+    name: Build (Backend)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build backend (dry-run)
+        run: pnpm --filter backend build
+        env:
+          CLOUDFLARE_API_TOKEN: dummy
+          CLOUDFLARE_ACCOUNT_ID: dummy
+
+      - name: Verify wrangler config
+        run: |
+          if [ -f "backend/wrangler.toml" ]; then
+            echo "✅ Backend wrangler.toml found"
+            cat backend/wrangler.toml
+          else
+            echo "❌ Backend wrangler.toml not found"
+            exit 1
+          fi
+
+  ci-success:
+    name: CI Success
+    runs-on: ubuntu-latest
+    needs: [lint, type-check, test-frontend, test-backend, build-frontend, build-backend]
+    if: always()
+    steps:
+      - name: Check all jobs
+        run: |
+          if [ "${{ contains(needs.*.result, 'failure') }}" = "true" ]; then
+            echo "❌ One or more CI jobs failed"
+            exit 1
+          elif [ "${{ contains(needs.*.result, 'cancelled') }}" = "true" ]; then
+            echo "⚠️  One or more CI jobs were cancelled"
+            exit 1
+          else
+            echo "✅ All CI jobs passed successfully"
+          fi
+
+      - name: CI Summary
+        if: always()
+        run: |
+          echo "## 🎯 CI Summary" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** All checks completed" >> $GITHUB_STEP_SUMMARY

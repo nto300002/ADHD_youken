@@ -1,0 +1,25 @@
+name = "adhd-youken"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+# D1 Database
+[[d1_databases]]
+binding = "DB"
+database_name = "adhd-youken-db"
+database_id = "local"
+migrations_dir = "drizzle/migrations"
+
+# KV Namespace (for sessions)
+[[kv_namespaces]]
+binding = "KV"
+id = "local"
+
+[vars]
+# 非機密な環境変数のみ（本番環境で上書き可能）
+FRONTEND_URL = "http://localhost:5173"
+
+# Secrets（.dev.varsまたはwrangler secret putで設定）
+# GITHUB_CLIENT_ID
+# GITHUB_CLIENT_SECRET
+# JWT_SECRET
+# ENCRYPTION_KEY

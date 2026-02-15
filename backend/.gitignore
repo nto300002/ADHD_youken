@@ -1,0 +1,22 @@
+# Dependencies
+node_modules
+
+# Wrangler
+.wrangler
+.dev.vars
+
+# Build output
+dist
+
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.local
+
+# Testing
+coverage
+
+# OS
+.DS_Store

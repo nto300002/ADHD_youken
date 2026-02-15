@@ -1,0 +1,19 @@
+# ローカル開発用環境変数テンプレート
+# このファイルを .dev.vars にコピーして使用してください
+# cp .dev.vars.example .dev.vars
+
+# GitHub OAuth
+# https://github.com/settings/developers でOAuthアプリを作成
+GITHUB_CLIENT_ID=your_github_client_id
+GITHUB_CLIENT_SECRET=your_github_client_secret
+
+# セキュリティキー（32文字以上のランダム文字列）
+# 生成方法: openssl rand -base64 32
+JWT_SECRET=your_jwt_secret_at_least_32_characters_long
+
+# 暗号化キー（32バイトのhex文字列）
+# 生成方法: openssl rand -hex 32
+ENCRYPTION_KEY=your_encryption_key_32_bytes_hex
+
+# フロントエンドURL
+FRONTEND_URL=http://localhost:5173

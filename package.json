@@ -1,0 +1,28 @@
+{
+  "name": "adhd-youken",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm --parallel --stream dev",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "dev:backend": "pnpm --filter backend dev",
+    "build": "pnpm --recursive build",
+    "build:frontend": "pnpm --filter frontend build",
+    "build:backend": "pnpm --filter backend build",
+    "test": "pnpm --recursive test",
+    "test:frontend": "pnpm --filter frontend test",
+    "test:backend": "pnpm --filter backend test",
+    "test:coverage": "pnpm --recursive test:coverage",
+    "type-check": "pnpm --recursive --parallel type-check",
+    "type-check:frontend": "pnpm --filter frontend type-check",
+    "type-check:backend": "pnpm --filter backend type-check",
+    "lint": "pnpm --recursive lint",
+    "db:generate": "pnpm --filter backend db:generate",
+    "db:migrate": "pnpm --filter backend db:migrate",
+    "db:migrate:prod": "pnpm --filter backend db:migrate:prod"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}
