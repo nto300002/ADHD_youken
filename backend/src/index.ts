@@ -1,12 +1,15 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { authRoutes } from './routes/auth';
+import { notesRoutes } from './routes/notes';
+import { webhookRoutes } from './routes/webhooks';
 
 export type Env = {
   DB: D1Database;
   KV: KVNamespace;
   GITHUB_CLIENT_ID: string;
   GITHUB_CLIENT_SECRET: string;
+  GITHUB_WEBHOOK_SECRET: string;
   JWT_SECRET: string;
   ENCRYPTION_KEY: string;
   FRONTEND_URL: string;
@@ -45,5 +48,11 @@ app.get('/health', (c) => {
 
 // 認証ルート
 app.route('/auth', authRoutes);
+
+// ノートルート
+app.route('/api/notes', notesRoutes);
+
+// Webhookルート
+app.route('/api/webhooks', webhookRoutes);
 
 export default app;
