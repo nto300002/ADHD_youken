@@ -16,8 +16,8 @@
     "db:migrate:prod": "wrangler d1 migrations apply adhd-youken-db"
   },
   "dependencies": {
-    "@hono/zod-validator": "^0.4.1",
-    "drizzle-orm": "^0.36.4",
+    "@hono/zod-validator": "^0.7.6",
+    "drizzle-orm": "^0.45.1",
     "hono": "^4.6.14",
     "nanoid": "^5.1.6",
     "octokit": "^4.0.2",
