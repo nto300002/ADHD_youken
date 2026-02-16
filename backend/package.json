@@ -30,7 +30,7 @@
     "@types/node": "^22.10.2",
     "@vitest/runner": "3.2.4",
     "@vitest/snapshot": "3.2.4",
-    "drizzle-kit": "^0.28.1",
+    "drizzle-kit": "^0.31.9",
     "eslint": "^9.17.0",
     "jest": "^29.7.0",
     "jest-environment-miniflare": "^2.14.4",
