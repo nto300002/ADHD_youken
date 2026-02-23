@@ -16,16 +16,16 @@
     "db:migrate:prod": "wrangler d1 migrations apply adhd-youken-db"
   },
   "dependencies": {
-    "@hono/zod-validator": "^0.4.1",
-    "drizzle-orm": "^0.36.4",
-    "hono": "^4.6.14",
+    "@hono/zod-validator": "^0.7.6",
+    "drizzle-orm": "^0.45.1",
+    "hono": "^4.12.1",
     "nanoid": "^5.1.6",
     "octokit": "^4.0.2",
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "^0.12.12",
-    "@cloudflare/workers-types": "^4.20241127.0",
+    "@cloudflare/vitest-pool-workers": "^0.12.14",
+    "@cloudflare/workers-types": "^4.20260228.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.10.2",
     "@vitest/runner": "3.2.4",
